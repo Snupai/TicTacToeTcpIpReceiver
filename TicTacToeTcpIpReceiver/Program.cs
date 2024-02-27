@@ -53,6 +53,7 @@ namespace TicTacToeTcpIpReceiver
 
                     while (true)
                     {
+                        char[,] board = new char[3, 3];
                         using TcpClient handler = await listener.AcceptTcpClientAsync();
 
                         WriteLine($"Client connected {handler.Client.RemoteEndPoint}");
@@ -62,6 +63,17 @@ namespace TicTacToeTcpIpReceiver
                         int anzBytesEmpfangen = await stream.ReadAsync(byteBuffer);
                         string empfangeneNachricht = Encoding.UTF8.GetString(byteBuffer);
                         WriteLine($"{anzBytesEmpfangen} received: {empfangeneNachricht}");
+                        string[] empfangenes = empfangeneNachricht.Split('\n');
+                        for (int i = 0; i < empfangenes.Length; i++)
+                        {
+                            string[] empfangeneChars = empfangenes[i].Split(';');
+                            for (int j = 0; j < empfangeneChars.Length; j++)
+                            {
+                                board[i, j] = empfangeneChars[j][0];
+                            }
+                        }
+
+                        ShowOnDisplay.DrawBitmap(board);
 
                         string currentTime = $"{DateTime.Now}";
                         byte[] currentTimeBytes = Encoding.UTF8.GetBytes(currentTime);
