@@ -11,6 +11,10 @@ namespace TicTacToeTcpIpReceiver
 {
     internal class ShowOnDisplay
     {
+        /// <summary>
+        /// Draw a bitmap with grid lines and text using SkiaSharp library
+        /// </summary>
+        /// <param name="characters">A 2D array of characters to be displayed on the grid</param>
         public static void DrawBitmap(char[,] characters)
         {
             // Define canvas size
@@ -21,6 +25,7 @@ namespace TicTacToeTcpIpReceiver
             using (var bitmap = new SKBitmap(canvasWidth, canvasHeight))
             {
 
+                // Define paint for drawing bold lines
                 using (var boldPaint = new SKPaint
                 {
                     Color = SKColors.Black,
@@ -96,7 +101,7 @@ namespace TicTacToeTcpIpReceiver
 
                         // Fix rotate by -90 degrees
                         canvas.RotateDegrees(-90, cellSize * 3 + cellSize / 2, cellSize / 2);
-                        //Draw Arrow alligned bottom right (somewhere around 264x176) facing down which suggests this way is down
+                        //Draw Arrow alligned bottom right facing down which suggests this way is down
                         int bootomRightCornerX = canvasWidth - 20;
                         canvas.DrawLine(bootomRightCornerX - 10, cellSize * 3 - 10, bootomRightCornerX - 10, cellSize * 3 - 30, boldPaint);
                         canvas.DrawLine(bootomRightCornerX - 10, cellSize * 3 - 10, bootomRightCornerX - 20, cellSize * 3 - 20, boldPaint);
@@ -109,14 +114,17 @@ namespace TicTacToeTcpIpReceiver
                     }
                 }
 
-                // Save the bitmap to a file or do whatever you need with it
+
+                // Load the bitmap into an SKImage and encode it as a PNG with quality 100
                 using (var image = SKImage.FromBitmap(bitmap))
+                // Encode the image data and save it to a file stream
                 using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
                 using (var stream = File.OpenWrite("grid_image.png"))
                 {
                     data.SaveTo(stream);
                 }
 
+                // Launch a Python script to draw on the e-paper with the generated image
                 System.Diagnostics.Process.Start("python3.11", "draw_on_e-paper.py --image grid_image.png");
             }
         }
